@@ -1,0 +1,184 @@
+<?php
+// 2JK Services — Page Recrutement (additif). URL : /recrutement.php
+$page = 'recrutement';
+$success = false; $errors = [];
+$old = ['fullname'=>'','email'=>'','phone'=>'','poste'=>'','ville'=>'','dispo'=>'','message'=>''];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    foreach (array_keys($old) as $k) $old[$k] = trim($_POST[$k] ?? '');
+    $consent = isset($_POST['consent']);
+    if (mb_strlen($old['fullname']) < 2) $errors['fullname'] = 'Veuillez indiquer votre nom complet.';
+    if (!filter_var($old['email'], FILTER_VALIDATE_EMAIL)) $errors['email'] = 'E-mail invalide.';
+    if (!preg_match('/^[0-9+\s().-]{7,20}$/', $old['phone'])) $errors['phone'] = 'Telephone invalide.';
+    if ($old['poste'] === '') $errors['poste'] = 'Choisissez un poste.';
+    if (!$consent) $errors['consent'] = 'Vous devez accepter le traitement de votre candidature.';
+    $cvName = null;
+    if (!empty($_FILES['cv']['name'])) {
+        if ($_FILES['cv']['error'] !== UPLOAD_ERR_OK) $errors['cv'] = 'Erreur envoi CV.';
+        else {
+            if ($_FILES['cv']['size'] > 5*1024*1024) $errors['cv'] = 'CV trop lourd (max 5 Mo).';
+            $ext = strtolower(pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, ['pdf','doc','docx'], true)) $errors['cv'] = 'Format accepte : PDF, DOC, DOCX.';
+            else {
+                $dir = __DIR__ . '/uploads/cv';
+                if (!is_dir($dir)) @mkdir($dir, 0755, true);
+                $cvName = date('Ymd-His') . '-' . preg_replace('/[^A-Za-z0-9._-]/', '_', basename($_FILES['cv']['name']));
+                if (empty($errors) && !@move_uploaded_file($_FILES['cv']['tmp_name'], $dir.'/'.$cvName)) $errors['cv'] = 'Impossible d enregistrer le CV.';
+            }
+        }
+    }
+    if (empty($errors)) {
+        try {
+            $dsn = getenv('DB_DSN') ?: '';
+            if ($dsn !== '') {
+                $pdo = new PDO($dsn, getenv('DB_USER') ?: '', getenv('DB_PASS') ?: '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                $st = $pdo->prepare("INSERT INTO recrutement_candidatures (fullname, email, phone, poste, ville, dispo, message, cv_file) VALUES (?,?,?,?,?,?,?,?)");
+                $st->execute([$old['fullname'],$old['email'],$old['phone'],$old['poste'],$old['ville'],$old['dispo'],$old['message'],$cvName]);
+            }
+        } catch (Throwable $e) {}
+        $rh = getenv('RECRUTEMENT_EMAIL') ?: '';
+        if ($rh !== '' && filter_var($rh, FILTER_VALIDATE_EMAIL)) {
+            @mail($rh, '[2JK Recrutement] '.$old['poste'].' — '.$old['fullname'], "Nom: {$old['fullname']}\nEmail: {$old['email']}\nTel: {$old['phone']}\nPoste: {$old['poste']}\nVille: {$old['ville']}\nDispo: {$old['dispo']}\nMessage: {$old['message']}\nCV: ".($cvName ?? 'non fourni'));
+        }
+        $success = true;
+        $old = ['fullname'=>'','email'=>'','phone'=>'','poste'=>'','ville'=>'','dispo'=>'','message'=>''];
+    }
+}
+function e($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recrutement - 2JK Services</title>
+<meta name="description" content="Rejoignez 2JK Services : agents d'entretien, techniciens, chefs d'equipe. Postulez en ligne." />
+<link rel="stylesheet" href="assets/css/interac.css" />
+<link rel="stylesheet" href="assets/css/recrutement.css" />
+</head>
+<body>
+<header class="rec-nav">
+<div class="rec-nav-inner">
+<a href="index.php" class="rec-brand">2JK <span>Services</span></a>
+<button class="rec-burger" aria-label="Ouvrir le menu" onclick="document.querySelector('.rec-links').classList.toggle('open')">☰</button>
+<nav class="rec-links" aria-label="Navigation principale">
+<a href="index.php">Accueil</a>
+<a href="services.php">Services</a>
+<a href="recrutement.php" class="active" aria-current="page">Recrutement</a>
+<a href="contact.php">Contact</a>
+<a href="checkout.php" class="rec-cta">Devis</a>
+</nav>
+</div>
+</header>
+<main>
+<section class="rec-hero">
+<div class="rec-hero-inner">
+<div>
+<span class="rec-pill">Nous recrutons</span>
+<h1>Rejoignez l'equipe <strong>2JK Services</strong></h1>
+<p>Nettoyage residentiel, commercial et industriel. Formation fournie, horaires flexibles, evolution vers chef d'equipe.</p>
+<div class="rec-hero-btns">
+<a href="#postes" class="btn-interac rec-btn">Voir les postes</a>
+<a href="#candidature" class="rec-btn ghost">Postuler en 2 min</a>
+</div>
+</div>
+<div class="rec-hero-card">
+<h2>Pourquoi nous ?</h2>
+<ul>
+<li>Formation remuneree des l'embauche</li>
+<li>Horaires flexibles (plein / partiel)</li>
+<li>Equipement et produits fournis</li>
+<li>Primes de performance</li>
+<li>Evolution : chef d'equipe / superviseur</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="postes" class="rec-section">
+<h2>Postes ouverts</h2>
+<p class="rec-sub">Cliquez sur Postuler : le formulaire ci-dessous sera pre-rempli.</p>
+<div class="rec-grid">
+<article class="rec-card">
+<h3>Agent d'entretien residentiel</h3>
+<p class="rec-meta">Temps plein / partiel - Formation fournie</p>
+<p>Menage de maisons et appartements : depoussierage, sols, salles de bain, cuisines.</p>
+<button class="btn-interac rec-btn small" onclick="choisirPoste(0)">Postuler</button>
+</article>
+<article class="rec-card">
+<h3>Technicien nettoyage commercial</h3>
+<p class="rec-meta">Soir / nuit / week-end - Primes</p>
+<p>Bureaux, commerces, coproprietes : vitres, sols, sanitaires. Debutants motives acceptes.</p>
+<button class="btn-interac rec-btn small" onclick="choisirPoste(1)">Postuler</button>
+</article>
+<article class="rec-card">
+<h3>Chef d'equipe nettoyage</h3>
+<p class="rec-meta">Temps plein - Permis un plus</p>
+<p>Encadrement de 2 a 5 agents, controle qualite, relation client. Experience 1 an exige.</p>
+<button class="btn-interac rec-btn small" onclick="choisirPoste(2)">Postuler</button>
+</article>
+<article class="rec-card">
+<h3>Candidature spontanee</h3>
+<p class="rec-meta">Tous profils motives</p>
+<p>Pas d'experience mais ponctuel et soigneux ? Envoyez votre candidature.</p>
+<button class="btn-interac rec-btn small" onclick="choisirPoste(3)">Postuler</button>
+</article>
+</div>
+</section>
+<section id="candidature" class="rec-section">
+<h2>Deposer ma candidature</h2>
+<?php if ($success): ?><p class="interac-success">Candidature envoyee ! Notre equipe RH vous recontactera tres vite.</p><?php endif; ?>
+<form class="rec-form" method="post" enctype="multipart/form-data" novalidate>
+<div class="rec-row">
+<div class="rec-field"><label for="fullname">Nom complet *</label>
+<input id="fullname" name="fullname" required value="<?php echo e($old['fullname']); ?>" placeholder="Ex. Marie Dupont" />
+<?php echo isset($errors['fullname']) ? '<small class="rec-err">'.e($errors['fullname']).'</small>' : ''; ?></div>
+<div class="rec-field"><label for="email">E-mail *</label>
+<input id="email" name="email" type="email" required value="<?php echo e($old['email']); ?>" placeholder="vous@exemple.ca" />
+<?php echo isset($errors['email']) ? '<small class="rec-err">'.e($errors['email']).'</small>' : ''; ?></div>
+</div>
+<div class="rec-row">
+<div class="rec-field"><label for="phone">Telephone *</label>
+<input id="phone" name="phone" type="tel" required value="<?php echo e($old['phone']); ?>" placeholder="514-555-1234" />
+<?php echo isset($errors['phone']) ? '<small class="rec-err">'.e($errors['phone']).'</small>' : ''; ?></div>
+<div class="rec-field"><label for="ville">Ville / Secteur</label>
+<input id="ville" name="ville" value="<?php echo e($old['ville']); ?>" placeholder="Ex. Montreal, Laval" /></div>
+</div>
+<div class="rec-row">
+<div class="rec-field"><label for="poste">Poste vise *</label>
+<select id="poste" name="poste" required>
+<option value="">- Choisir -</option>
+<option <?php echo $old['poste']==='Agent residentiel'?'selected':''; ?>>Agent residentiel</option>
+<option <?php echo $old['poste']==='Technicien commercial'?'selected':''; ?>>Technicien commercial</option>
+<option <?php echo $old['poste']==='Chef equipe'?'selected':''; ?>>Chef equipe</option>
+<option <?php echo $old['poste']==='Spontanee'?'selected':''; ?>>Spontanee</option>
+</select>
+<?php echo isset($errors['poste']) ? '<small class="rec-err">'.e($errors['poste']).'</small>' : ''; ?></div>
+<div class="rec-field"><label for="dispo">Disponibilites</label>
+<select id="dispo" name="dispo">
+<option value="">- Choisir -</option>
+<option <?php echo $old['dispo']==='Temps plein'?'selected':''; ?>>Temps plein</option>
+<option <?php echo $old['dispo']==='Temps partiel'?'selected':''; ?>>Temps partiel</option>
+<option <?php echo $old['dispo']==='Soir / nuit'?'selected':''; ?>>Soir / nuit</option>
+<option <?php echo $old['dispo']==='Week-end'?'selected':''; ?>>Week-end</option>
+<option <?php echo $old['dispo']==='Flexible'?'selected':''; ?>>Flexible</option>
+</select></div>
+</div>
+<div class="rec-field"><label for="cv">CV (PDF, DOC, DOCX - max 5 Mo)</label>
+<input id="cv" name="cv" type="file" accept=".pdf,.doc,.docx" />
+<?php echo isset($errors['cv']) ? '<small class="rec-err">'.e($errors['cv']).'</small>' : ''; ?></div>
+<div class="rec-field"><label for="message">Presentez-vous en quelques lignes</label>
+<textarea id="message" name="message" rows="4" placeholder="Experience, motivations, permis, langues..."><?php echo e($old['message']); ?></textarea></div>
+<label class="rec-consent"><input type="checkbox" name="consent" required /> J'accepte que 2JK Services traite mes donnees pour ma candidature. *</label>
+<?php echo isset($errors['consent']) ? '<small class="rec-err">'.e($errors['consent']).'</small>' : ''; ?>
+<button type="submit" class="btn-interac rec-btn">Envoyer ma candidature</button>
+<p class="rec-privacy">Vos donnees ne servent qu'au recrutement et ne sont jamais revendues.</p>
+</form>
+</section>
+</main>
+<footer class="rec-footer"><p>© <?php echo date('Y'); ?> 2JK Services - Recrutement - <a href="contact.php">Nous contacter</a></p></footer>
+<script>
+var postes=['Agent residentiel','Technicien commercial','Chef equipe','Spontanee'];
+function choisirPoste(i){document.getElementById('poste').selectedIndex=i+1;document.getElementById('candidature').scrollIntoView({behavior:'smooth'});}
+</script>
+</body>
+</html>
+

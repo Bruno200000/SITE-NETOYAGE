@@ -1,0 +1,15 @@
+/* Admin RH - additif responsive */
+.rh-wrap{max-width:1150px;margin:0 auto;padding:20px 16px}
+.rh-stats{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.rh-chip{background:#eef1f4;border:1px solid #dde3e8;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.st-nouveau{background:#e7f1ff;border-color:#b6d4fe}.st-contacte{background:#fff3cd;border-color:#ffecb5}
+.st-entretien{background:#e0cffc;border-color:#c29ffa}.st-accepte{background:#d1e7dd;border-color:#badbcc}
+.st-refuse{background:#f8d7da;border-color:#f5c2c7}
+.rh-filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.rh-filters select,.rh-filters input{border:1px solid #cfd4da;border-radius:8px;padding:8px;font-size:14px}
+.rh-reset{align-self:center;color:#c8102e;font-weight:700}
+.rh-msg{max-width:260px}
+.rh-actions{display:flex;gap:6px}
+.rh-actions select{border:1px solid #cfd4da;border-radius:6px;padding:6px}
+.rh-actions button{background:#1d2129;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer}
+@media(max-width:640px){.rh-filters select,.rh-filters input{flex:1 1 100%}}

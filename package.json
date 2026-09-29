@@ -1,0 +1,11 @@
+{
+  "name": "2jk-services-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend-nextjs run dev",
+    "build": "npm --prefix frontend-nextjs run build",
+    "preview": "npm --prefix frontend-nextjs run preview",
+    "install:frontend": "npm --prefix frontend-nextjs install"
+  }
+}

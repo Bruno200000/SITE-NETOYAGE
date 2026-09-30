@@ -14,8 +14,9 @@ export function PageHero({ eyebrow, title, text, image, ctaHref, ctaLabel }: Pag
   return (
     <section className="relative isolate min-h-[440px] overflow-hidden bg-brand-ink text-white">
       <div className="kenburns absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${image})` }} />
-      <div className="absolute inset-0 bg-gradient-to-r from-brand-ink/96 via-brand-ink/88 to-brand-ink/62" />
-      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,122,26,0.16),transparent_38%),radial-gradient(circle_at_78%_20%,rgba(22,163,74,0.18),transparent_24%)]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-brand-ink/98 via-brand-ink/95 to-brand-ink/84" />
+      <div className="absolute inset-0 bg-black/25" />
+      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,122,26,0.12),transparent_38%),radial-gradient(circle_at_78%_20%,rgba(22,163,74,0.12),transparent_24%)]" />
       <div className="container-page relative flex min-h-[440px] items-center justify-center py-16">
         <div className="reveal-up mx-auto max-w-3xl text-center">
           <p className="mb-4 inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 text-xs font-black uppercase tracking-[0.2em] text-brand-mint backdrop-blur">

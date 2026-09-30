@@ -62,7 +62,7 @@ export const siteImages = {
   hero: "https://images.unsplash.com/photo-1603712725038-e9334ae8f39f?auto=format&fit=crop&w=2400&q=85",
   team: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1400&q=85",
   office: "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1400&q=85",
-  commercial: "/commercial-cleaning.jpg",
+  commercial: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1800&q=88",
   home: "/residential-cleaning.jpg",
   eco: "/eco-cleaning.jpg",
   car: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=1400&q=85",

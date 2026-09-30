@@ -9,7 +9,7 @@ const RESOURCE_MAP = [
     'gallery' => ['table' => 'gallery_images', 'public_read' => true, 'public_write' => false, 'required' => ['title', 'image']],
     'testimonials' => ['table' => 'testimonials', 'public_read' => true, 'public_write' => true, 'required' => ['client_name', 'comment']],
     'quotes' => ['table' => 'quotes', 'public_read' => false, 'public_write' => true, 'required' => ['email', 'phone']],
-    'appointments' => ['table' => 'appointments', 'public_read' => false, 'public_write' => true, 'required' => ['name', 'email', 'phone']],
+    'appointments' => ['table' => 'appointments', 'public_read' => false, 'public_write' => true, 'required' => ['name', 'email', 'phone', 'appointment_date', 'appointment_time']],
     'contacts' => ['table' => 'contact_messages', 'public_read' => false, 'public_write' => true, 'required' => ['name', 'email', 'message']],
     'applications' => ['table' => 'applications', 'public_read' => false, 'public_write' => true, 'required' => ['fullname', 'email', 'phone', 'poste']],
     'job-offers' => ['table' => 'job_offers', 'public_read' => true, 'public_write' => false, 'required' => ['title', 'slug']],
@@ -180,9 +180,16 @@ function create_resource(string $resource): void
         $data['mode'] = $data['mode'] ?? 'TEST';
         $data['customer_notified'] = 1;
     }
-    if ($resource === 'gallery' && empty($data['image'])) {
-        $data['image'] = $data['after_image'] ?? $data['before_image'] ?? '';
+    if ($resource === 'gallery') {
+        if (empty($data['image'])) {
+            $data['image'] = !empty($data['after_image']) ? $data['after_image'] : (!empty($data['before_image']) ? $data['before_image'] : 'uploads/media/default.jpg');
+        }
+        if (isset($data['is_before_after'])) {
+            $data['is_before_after'] = (int) $data['is_before_after'];
+        }
     }
+    // NOTE: la creation des rendez-vous passe par create_appointment() (voir api/index.php),
+    // pas par create_resource(). Aucune validation de creneau ici (evite reference a $id indefini).
     if ($resource === 'applications') {
         if (!empty($data['adresse']) || !empty($data['code_postal'])) {
             $parts = array_filter([$data['adresse'] ?? '', $data['ville'] ?? '', $data['code_postal'] ?? '']);
@@ -201,14 +208,34 @@ function create_resource(string $resource): void
         $data = prepare_user_payload($data, true);
     }
     $table = $config['table'];
-    $columns = array_keys($data);
+
+    // Only keep columns that actually exist in the target table
+    try {
+        $existingCols = db()->query("SHOW COLUMNS FROM `$table`")->fetchAll(PDO::FETCH_COLUMN);
+    } catch (PDOException $e) {
+        error_log('[2JK API] create_resource(' . $resource . ') show columns error: ' . $e->getMessage());
+        fail('Table "' . $table . '" inaccessible.', 503);
+    }
+
+    $validData = [];
+    foreach ($data as $col => $val) {
+        if (in_array($col, $existingCols, true) && $col !== 'id') {
+            $validData[$col] = $val;
+        }
+    }
+
+    if (empty($validData)) {
+        fail('Aucune colonne valide pour cette table.', 422);
+    }
+
+    $columns = array_keys($validData);
     $placeholders = array_fill(0, count($columns), '?');
     $sql = "INSERT INTO `$table` (`" . implode('`,`', $columns) . "`) VALUES (" . implode(',', $placeholders) . ")";
     try {
-        db()->prepare($sql)->execute(array_values($data));
+        db()->prepare($sql)->execute(array_values($validData));
     } catch (PDOException $e) {
         error_log('[2JK API] create_resource(' . $resource . ') impossible: ' . $e->getMessage());
-        fail('Creation impossible : colonne/table manquante. Importez database/nettoyage.sql + migrations 005/006.', 503);
+        fail('Creation impossible : ' . $e->getMessage(), 500);
     }
     $created = ['id' => (int) db()->lastInsertId()];
     if ($resource === 'payments') {
@@ -230,31 +257,50 @@ function update_resource(string $resource, int $id): void
     if ($resource === 'users') {
         $data = prepare_user_payload($data, false);
     }
+    if ($resource === 'gallery') {
+        if (isset($data['is_before_after'])) {
+            $data['is_before_after'] = (int) $data['is_before_after'];
+        }
+        if (isset($data['after_image']) && empty($data['image'])) {
+            $data['image'] = $data['after_image'];
+        }
+    }
     if (!$data) {
         ok(null, 'Aucune modification.');
     }
     $table = $config['table'];
     try {
+        $cols = db()->query("SHOW COLUMNS FROM `$table`")->fetchAll();
+        $existingCols = [];
         $hasUpdatedAt = false;
-        try {
-            $cols = db()->query("SHOW COLUMNS FROM `$table`")->fetchAll();
-            foreach ($cols as $col) {
-                if (($col['Field'] ?? '') === 'updated_at') {
-                    $hasUpdatedAt = true;
-                    break;
-                }
+        foreach ($cols as $col) {
+            $colName = $col['Field'] ?? '';
+            $existingCols[] = $colName;
+            if ($colName === 'updated_at') {
+                $hasUpdatedAt = true;
             }
-        } catch (PDOException $e) {
-            $hasUpdatedAt = false;
         }
-        $sets = array_map(fn($col) => "`$col` = ?", array_keys($data));
-        $values = array_values($data);
+
+        $validData = [];
+        foreach ($data as $col => $val) {
+            if (in_array($col, $existingCols, true) && !in_array($col, ['id', 'created_at', 'updated_at'], true)) {
+                $validData[$col] = $val;
+            }
+        }
+
+        if (empty($validData)) {
+            ok(null, 'Aucune modification appliquee.');
+            return;
+        }
+
+        $sets = array_map(fn($col) => "`$col` = ?", array_keys($validData));
+        $values = array_values($validData);
         $values[] = $id;
         $suffix = $hasUpdatedAt ? ", updated_at = NOW()" : "";
         db()->prepare("UPDATE `$table` SET " . implode(',', $sets) . $suffix . " WHERE id = ?")->execute($values);
     } catch (PDOException $e) {
         error_log('[2JK API] update_resource(' . $resource . ') impossible: ' . $e->getMessage());
-        fail('Modification impossible : colonne/table manquante.', 503);
+        fail('Modification impossible : ' . $e->getMessage(), 500);
     }
     ok(null, 'Modification reussie.');
 }

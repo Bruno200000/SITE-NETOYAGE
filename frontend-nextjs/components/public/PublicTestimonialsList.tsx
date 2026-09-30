@@ -32,7 +32,8 @@ export function PublicTestimonialsList() {
       .then((rows) => {
         if (!mounted) return;
         const published = rows.filter((row) => isPubliclyVisible(row.status, ["published", "active"]));
-        if (rows.length) setItems(published);
+        // Ne jamais effacer le fallback si l'API ne renvoie rien de visible.
+        if (published.length > 0) setItems(published);
       })
       .catch(() => undefined);
     return () => {

@@ -55,8 +55,11 @@ export function BlogDetailClient({ slug }: { slug: string }) {
     fetchPublicList<BlogPost>("posts")
       .then((rows) => {
         if (!mounted) return;
+        if (!rows.length) return; // API vide / inaccessible -> garder le fallback
         const published = rows.filter((post) => isPubliclyVisible(post.status, ["published", "active"]));
-        if (rows.length) setPosts(published);
+        // Ne remplacer que si on a du contenu visible, sinon garder le fallback (evite "Article introuvable").
+        if (published.length > 0) setPosts(published);
+        else setPosts(rows);
       })
       .catch(() => undefined);
     return () => {

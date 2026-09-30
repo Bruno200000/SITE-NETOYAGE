@@ -68,8 +68,6 @@ const groups: AdminGroup[] = [
   }
 ];
 
-const adminHrefs = groups.flatMap((group) => group.href ? [group.href] : group.children?.map(([, href]) => href) || []);
-
 function isGroupActive(pathname: string, group: AdminGroup): boolean {
   if (group.href) return pathname === group.href || pathname.startsWith(`${group.href}/`);
   return Boolean(group.children?.some(([, href]) => pathname === href.split("#")[0]));
@@ -107,7 +105,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     if (shouldProtectAdminPath(pathname) && !hasAdminToken()) {
       router.replace("/admin/login");
     }
-    adminHrefs.forEach((href) => router.prefetch(href));
   }, [pathname, router]);
 
   function handleLogout() {

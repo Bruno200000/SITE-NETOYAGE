@@ -8,6 +8,7 @@ require_once __DIR__ . '/helpers/validator.php';
 require_once __DIR__ . '/helpers/upload.php';
 require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/CrudController.php';
+require_once __DIR__ . '/controllers/AppointmentController.php';
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token');
@@ -42,6 +43,16 @@ if (($parts[0] ?? '') === 'auth') {
         auth_update_password();
     }
     fail('Route auth introuvable.', 404);
+}
+
+if (($parts[0] ?? '') === 'appointments' && ($parts[1] ?? '') === 'availability') {
+    if ($method === 'GET') {
+        get_appointment_availability();
+    }
+    if ($method === 'PUT') {
+        update_appointment_availability();
+    }
+    fail('Méthode non supportée.', 405);
 }
 
 if (($parts[0] ?? '') === 'upload' && $method === 'POST') {
@@ -90,7 +101,7 @@ require_resource_auth($config, $method);
 
 match ($method) {
     'GET' => $id ? get_resource($resource, $id) : list_resource($resource),
-    'POST' => create_resource($resource),
+    'POST' => $resource === 'appointments' ? create_appointment() : create_resource($resource),
     'PUT', 'PATCH' => $id ? update_resource($resource, $id) : fail('ID requis.', 422),
     'DELETE' => $id ? delete_resource($resource, $id) : fail('ID requis.', 422),
     default => fail('Méthode non supportée.', 405),

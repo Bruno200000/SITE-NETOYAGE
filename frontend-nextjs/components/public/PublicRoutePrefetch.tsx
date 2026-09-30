@@ -10,11 +10,15 @@ const publicRoutes = [
   "/galerie/",
   "/avant-apres/",
   "/blog/",
+  "/paiement/",
   "/contact/",
   "/devis/",
   "/rendez-vous/",
   "/temoignages/",
   "/faq/",
+  "/politique-confidentialite/",
+  "/mentions-legales/",
+  "/conditions-utilisation/",
   "/recrutement/"
 ];
 
@@ -24,7 +28,7 @@ export function PublicRoutePrefetch() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       publicRoutes.forEach((route) => router.prefetch(route));
-    }, 800);
+    }, 0);
 
     return () => window.clearTimeout(timer);
   }, [router]);

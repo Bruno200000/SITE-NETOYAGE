@@ -14,7 +14,7 @@ export default function PaymentPage() {
         eyebrow="Paiement & Facturation"
         title="Règlement simple, rapide et 100% sécurisé."
         text="Retrouvez ici toutes les informations pour régler vos factures : Virement Interac au Canada, carte bancaire ou entente commerciale d'entreprise."
-        image={siteImages.commercial}
+        image={siteImages.team}
       />
       <Section eyebrow="Modes de règlement" title="Consultez nos modalités de paiement et notifiez votre virement.">
         <PaymentProofForm />

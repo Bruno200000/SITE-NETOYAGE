@@ -45,7 +45,9 @@ export function ServiceDetailClient({ slug }: { slug: string }) {
       .then((rows) => {
         if (!mounted) return;
         const active = rows.filter((row) => isPubliclyVisible(row.status, ["active", "published"]));
-        if (rows.length) setServices(active);
+        // Ne remplacer le fallback que si l'API renvoie du contenu visible.
+        // Sinon on garde les services de secours -> la section n'est jamais vide.
+        if (active.length > 0) setServices(active);
       })
       .catch(() => undefined);
     return () => {

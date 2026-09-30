@@ -57,8 +57,8 @@ form :is(input, select, textarea) {
 
 .hero-gradient {
   background:
-    linear-gradient(90deg, rgba(7, 17, 31, 0.96) 0%, rgba(7, 17, 31, 0.78) 44%, rgba(7, 17, 31, 0.2) 82%),
-    linear-gradient(0deg, rgba(7, 17, 31, 0.92) 0%, rgba(7, 17, 31, 0.16) 42%, rgba(7, 17, 31, 0.58) 100%);
+    linear-gradient(90deg, rgba(7, 17, 31, 0.96) 0%, rgba(7, 17, 31, 0.86) 44%, rgba(7, 17, 31, 0.48) 82%),
+    linear-gradient(0deg, rgba(7, 17, 31, 0.92) 0%, rgba(7, 17, 31, 0.28) 42%, rgba(7, 17, 31, 0.72) 100%);
 }
 
 .hero-banner {

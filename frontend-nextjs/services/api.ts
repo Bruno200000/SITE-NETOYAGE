@@ -15,6 +15,7 @@ const apiBaseCandidates = Array.from(new Set([
 
 type RetryConfig = InternalAxiosRequestConfig & {
   _apiFallbackIndex?: number;
+  _silent?: boolean;
 };
 
 const listCache = new Map<string, { time: number; data: unknown[] }>();
@@ -29,6 +30,15 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("2jk_token") : null;
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
+  // Marquer les lectures silencieuses pour ne pas afficher de popup Swal en cas d'echec
+  const retryConfig = config as RetryConfig;
+  if (config.headers?.["X-Silent"]) {
+    retryConfig._silent = true;
+    delete config.headers["X-Silent"];
+  }
   return config;
 });
 
@@ -59,19 +69,25 @@ api.interceptors.response.use(
       ? "API inaccessible. Verifiez que Apache est lance dans XAMPP et que l'URL API correspond au dossier du projet."
       : error.response?.data?.message || "Une erreur est survenue.";
 
-    if (typeof window !== "undefined") {
+    // Lectures publiques silencieuses (services, blog...) : pas de popup,
+    // le composant garde son contenu de secours visible.
+    if (typeof window !== "undefined" && !config?._silent) {
       Swal.fire({ icon: "error", title: "Erreur", text: message, confirmButtonColor: "#0b63ce" });
     }
     return Promise.reject(new Error(message));
   }
 );
 
-export async function getList<T>(resource: string, force = false): Promise<T[]> {
+export async function getList<T>(resource: string, force = false, silent = true): Promise<T[]> {
   const cached = listCache.get(resource);
   if (!force && cached && Date.now() - cached.time < LIST_CACHE_TTL) {
     return cached.data as T[];
   }
-  const response = await api.get<unknown, { data: T[] }>(`/${resource}`);
+  // Lecture publique silencieuse par defaut : pas de popup Swal si l'API est KO,
+  // le composant garde son fallback (services / blog restent visibles).
+  const response = await api.get<unknown, { data: T[] }>(`/${resource}`, {
+    headers: silent ? { "X-Silent": "1" } : undefined,
+  });
   listCache.set(resource, { time: Date.now(), data: response.data as unknown[] });
   return response.data;
 }

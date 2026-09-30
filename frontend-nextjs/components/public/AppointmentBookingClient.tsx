@@ -24,10 +24,10 @@ export function AppointmentBookingClient() {
     "https://calendar.google.com/calendar/appointments/schedules/";
 
   const steps = [
-    [FaCalendarCheck, "Créneaux en temps réel", "Les plages horaires libres sont synchronisées avec Google Agenda."],
-    [FaClock, "Réservation autonome", "Le créneau est bloqué immédiatement sans attente de validation."],
+    [FaCalendarCheck, "Créneaux disponibles", "Les jours et heures libres suivent le planning de l’équipe."],
+    [FaClock, "Demande enregistrée", "Un créneau réservé est retiré du calendrier pendant le suivi de votre demande."],
     [FaMapMarkerAlt, "Intervention mobile", "Nos équipes se déplacent avec matériel et produits professionnels."],
-    [FaShieldAlt, "Confirmation instantanée", "Récapitulatif par courriel et notification d'agenda."],
+    [FaShieldAlt, "Confirmation par l’équipe", "Notre équipe valide les détails de l’intervention avec vous."],
   ] as const;
 
   return (

@@ -7,15 +7,60 @@ export default function AdminBeforeAfterPage() {
       <CrudTable
         title="Transformations Avant / Après"
         resource="gallery"
-        description="Ajoutez ou actualisez vos réalisations avant/après. Vous pouvez téléverser les photos et rédiger vos commentaires d'intervention visibles par les clients."
+        description="Gérez les démonstrations de résultats avant / après de 2JK Services. Les clients peuvent glisser le curseur interactif et lire vos explications sur la méthode de nettoyage."
         fields={[
-          { name: "title", label: "Titre de la réalisation", required: true, placeholder: "Ex: Rénovation cuisine commerciale ou Habitacle auto" },
-          { name: "before_image", label: "Photo AVANT (téléversement ou URL)", required: true, type: "image" },
-          { name: "after_image", label: "Photo APRÈS (téléversement ou URL)", required: true, type: "image" },
-          { name: "alt_text", label: "Commentaires de l'équipe / Détails des travaux", type: "textarea", placeholder: "Décrivez le travail réalisé, les défis relevés, les produits écologiques utilisés et le résultat final." },
-          { name: "is_before_after", label: "Affichage comparatif", type: "select", options: [{ label: "Curseur interactif Avant / Après", value: "1" }, { label: "Image simple", value: "0" }] },
-          { name: "display_order", label: "Ordre d'affichage (1 = premier)", type: "number" },
-          { name: "status", label: "Publication", type: "select", options: [{ label: "Publié (en ligne)", value: "active" }, { label: "Brouillon (masqué)", value: "inactive" }] }
+          {
+            name: "title",
+            label: "Titre de la réalisation",
+            required: true,
+            placeholder: "Ex: Remise à neuf habitacle automobile & sièges tachés"
+          },
+          {
+            name: "before_image",
+            label: "Photo AVANT intervention",
+            required: true,
+            type: "image",
+            badge: "Photo Avant",
+            placeholder: "Téléversez la photo avant nettoyage"
+          },
+          {
+            name: "after_image",
+            label: "Photo APRÈS intervention",
+            required: true,
+            type: "image",
+            badge: "Photo Après",
+            placeholder: "Téléversez la photo après nettoyage"
+          },
+          {
+            name: "alt_text",
+            label: "Commentaires de l'équipe & détails des travaux",
+            type: "textarea",
+            placeholder: "Détaillez le travail accompli : état initial difficile, injection-extraction haute pression, traitement antibactérien écologique, résultat impeccable sans odeur."
+          },
+          {
+            name: "is_before_after",
+            label: "Mode d'affichage",
+            type: "select",
+            options: [
+              { label: "Curseur comparatif interactif (Avant / Après)", value: "1" },
+              { label: "Photo simple dans la galerie", value: "0" }
+            ]
+          },
+          {
+            name: "display_order",
+            label: "Ordre d'affichage (1 = en tête)",
+            type: "number",
+            placeholder: "1"
+          },
+          {
+            name: "status",
+            label: "Statut de publication",
+            type: "select",
+            options: [
+              { label: "Publié (visible sur le site)", value: "active" },
+              { label: "Brouillon (masqué)", value: "inactive" }
+            ]
+          }
         ]}
       />
     </AdminLayout>

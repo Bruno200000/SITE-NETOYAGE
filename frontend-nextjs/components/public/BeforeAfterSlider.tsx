@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FaComment, FaPaperPlane, FaQuoteLeft, FaStar, FaUserCheck } from "react-icons/fa";
+import { FaStar, FaUserCheck } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 type BeforeAfterSliderProps = {
@@ -11,11 +11,6 @@ type BeforeAfterSliderProps = {
   text?: string;
 };
 
-type CommentItem = {
-  author: string;
-  date: string;
-  message: string;
-};
 
 export function BeforeAfterSlider({ title, beforeImage, afterImage, text }: BeforeAfterSliderProps) {
   const [position, setPosition] = useState(50);
@@ -29,7 +24,7 @@ export function BeforeAfterSlider({ title, beforeImage, afterImage, text }: Befo
       message: "Transformation spectaculaire ! L'équipe a été très minutieuse et rapide."
     }
   ]);
-  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(true);
   const [authorName, setAuthorName] = useState("");
   const [commentText, setCommentText] = useState("");
 
@@ -45,29 +40,6 @@ export function BeforeAfterSlider({ title, beforeImage, afterImage, text }: Befo
     return () => window.clearInterval(timer);
   }, []);
 
-  function handleAddComment(e: React.FormEvent) {
-    e.preventDefault();
-    if (!commentText.trim()) return;
-
-    const newComment: CommentItem = {
-      author: authorName.trim() || "Visiteur",
-      date: "À l'instant",
-      message: commentText.trim()
-    };
-
-    setComments((prev) => [newComment, ...prev]);
-    setAuthorName("");
-    setCommentText("");
-    setShowCommentForm(false);
-
-    Swal.fire({
-      icon: "success",
-      title: "Merci pour votre commentaire !",
-      text: "Votre avis a été ajouté avec succès sous cette réalisation.",
-      confirmButtonColor: "#ff7a1a",
-      timer: 3000
-    });
-  }
 
   return (
     <article className="reveal-up overflow-hidden rounded-2xl bg-white shadow-premium ring-1 ring-slate-100 flex flex-col justify-between">
@@ -112,69 +84,6 @@ export function BeforeAfterSlider({ title, beforeImage, afterImage, text }: Befo
         </div>
       </div>
 
-      {/* Section Commentaires sous la réalisation */}
-      <div className="border-t border-slate-100 bg-slate-50/70 p-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
-            <FaComment className="text-brand-orange" /> Commentaires &amp; Avis ({comments.length})
-          </h3>
-          <button
-            type="button"
-            onClick={() => setShowCommentForm((prev) => !prev)}
-            className="text-xs font-bold text-brand-orange hover:text-orange-700 transition"
-          >
-            {showCommentForm ? "Fermer" : "+ Laisser un commentaire"}
-          </button>
-        </div>
-
-        {/* Comment form */}
-        {showCommentForm ? (
-          <form onSubmit={handleAddComment} className="mt-4 rounded-xl bg-white p-4 border border-slate-200 shadow-sm space-y-3">
-            <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-600 mb-1">Votre nom ou prénom</label>
-              <input
-                type="text"
-                value={authorName}
-                onChange={(e) => setAuthorName(e.target.value)}
-                placeholder="Ex. Patrick, Propriétaire"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-none focus:border-brand-orange"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-600 mb-1">Votre commentaire *</label>
-              <textarea
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Partagez votre avis ou posez une question sur cette transformation..."
-                rows={2}
-                required
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-none focus:border-brand-orange"
-              />
-            </div>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-orange px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-orange-600 transition"
-            >
-              <FaPaperPlane className="text-[10px]" /> Publier mon commentaire
-            </button>
-          </form>
-        ) : null}
-
-        {/* Comments list */}
-        <div className="mt-3 space-y-2.5">
-          {comments.map((c, idx) => (
-            <div key={`${c.author}-${idx}`} className="rounded-xl bg-white p-3.5 border border-slate-100 text-xs shadow-sm">
-              <div className="flex items-center justify-between text-slate-500 mb-1">
-                <span className="font-bold text-brand-navy flex items-center gap-1">
-                  <FaQuoteLeft className="text-[10px] text-brand-orange/60" /> {c.author}
-                </span>
-                <span className="text-[10px] text-slate-400">{c.date}</span>
-              </div>
-              <p className="text-slate-600 leading-relaxed pl-3.5 border-l-2 border-brand-orange/40">{c.message}</p>
-            </div>
-          ))}
-        </div>
-      </div>
     </article>
   );
 }

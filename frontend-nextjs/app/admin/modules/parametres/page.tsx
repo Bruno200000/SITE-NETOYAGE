@@ -2,69 +2,44 @@
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { CrudTable } from "@/components/admin/CrudTable";
-import { FaCalendarAlt, FaCog, FaFacebook, FaInstagram, FaInfoCircle, FaWhatsapp } from "react-icons/fa";
+import { FaBookOpen, FaCheckCircle, FaCog, FaImage, FaUsers, FaCalendarAlt, FaSave } from "react-icons/fa";
 
-const settingKeys = [
-  { icon: FaCog, key: "company_name", label: "Nom de l'entreprise", example: "2JK Services Inc." },
-  { icon: FaCog, key: "slogan", label: "Slogan affiché sur le site", example: "Des espaces impeccables, une équipe fiable." },
-  { icon: FaCog, key: "phone", label: "Téléphone principal", example: "514 623 5610" },
-  { icon: FaWhatsapp, key: "whatsapp", label: "Numéro WhatsApp (avec indicatif)", example: "+15146235610" },
-  { icon: FaCog, key: "email", label: "Email de contact / Interac", example: "contact@2jkservices.com" },
-  { icon: FaCog, key: "address", label: "Adresse affichée", example: "Nouveau-Brunswick, Canada" },
-  { icon: FaCog, key: "zone_intervention", label: "Zone d'intervention", example: "Nouveau-Brunswick & régions environnantes" },
-  { icon: FaFacebook, key: "facebook", label: "URL page Facebook", example: "https://www.facebook.com/2jkservices" },
-  { icon: FaInstagram, key: "instagram", label: "URL compte Instagram", example: "https://www.instagram.com/2jkservices" },
-  { icon: FaCalendarAlt, key: "google_calendar_url", label: "URL Google Agenda (Rendez-vous en ligne)", example: "https://calendar.google.com/calendar/appointments/schedules/VOTRE_ID" },
-];
 
 export default function AdminSettingsPage() {
   return (
     <AdminLayout>
-      {/* Configuration Guide Card */}
-      <div className="mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/70 via-indigo-50/30 to-white p-6 shadow-sm">
+      <section className="mb-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/70 via-indigo-50/30 to-white p-6 shadow-sm">
         <div className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-600">
-            <FaInfoCircle className="text-lg" />
+            <FaBookOpen className="text-lg" />
           </span>
-          <div className="min-w-0">
-            <h3 className="text-lg font-black text-brand-navy">Guide des paramètres configurables</h3>
-            <p className="mt-1 text-xs text-slate-500 leading-5">
-              Utilisez les clés ci-dessous dans le champ <strong>Clé technique</strong> pour modifier les informations affichées sur le site en temps réel.
-              <br />
-              <strong className="text-brand-orange">⭐ Priorité :</strong> Pour activer le calendrier de réservation en ligne, configurez la clé <code className="rounded bg-slate-100 px-1 py-0.5 text-xs font-mono text-brand-navy">google_calendar_url</code>.
-            </p>
+          <div>
+            <h2 className="text-lg font-black text-brand-navy">Guide de l&apos;administration</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600">Utilisez ce panneau pour gérer le contenu du site et suivre les demandes de vos clients.</p>
           </div>
         </div>
-
-        <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {settingKeys.map(({ icon: Icon, key, label, example }) => (
-            <div key={key} className="flex items-start gap-2.5 rounded-xl bg-white p-3 border border-slate-100 shadow-sm">
-              <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-orange-50 text-brand-orange text-sm">
-                <Icon />
-              </span>
-              <div className="min-w-0">
-                <p className="text-[11px] font-black uppercase tracking-wider text-slate-700">{label}</p>
-                <code className="block truncate text-[10px] font-mono text-brand-navy mt-0.5">{key}</code>
-                <p className="mt-0.5 truncate text-[10px] text-slate-400 italic">{example}</p>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {[
+            [FaCheckCircle, "Tableau de bord", "Consultez rapidement les statistiques et les dernières demandes."],
+            [FaCog, "Services", "Ajoutez ou modifiez les prestations, descriptions, prix et statuts de publication."],
+            [FaImage, "Galerie / Avant-Après", "Ajoutez les photos avant et après, puis publiez uniquement les réalisations terminées."],
+            [FaUsers, "Recrutement", "Consultez les candidatures reçues et ouvrez les CV transmis par les candidats."],
+            [FaCalendarAlt, "Rendez-vous", "Gérez les disponibilités et consultez les demandes de rendez-vous des clients."],
+            [FaSave, "Enregistrer", "Après chaque modification, cliquez sur Enregistrer et vérifiez le message de confirmation."],
+          ].map(([Icon, title, description]) => (
+            <div key={String(title)} className="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+              <div className="flex items-center gap-2 text-sm font-black text-brand-navy">
+                <span className="text-brand-orange"><Icon /></span>
+                {title}
               </div>
+              <p className="mt-2 text-xs leading-5 text-slate-500">{description}</p>
             </div>
           ))}
         </div>
-
-        {/* Google Calendar Setup Help */}
-        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/60 p-4">
-          <p className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-700">
-            <FaCalendarAlt /> Comment obtenir votre URL Google Agenda ?
-          </p>
-          <ol className="mt-2 space-y-1 text-xs text-amber-900/80 leading-5 list-decimal list-inside">
-            <li>Allez sur <strong>calendar.google.com</strong> et connectez-vous avec votre compte Google professionnel.</li>
-            <li>Cliquez sur <strong>+ Créer → Créneaux de rendez-vous</strong>.</li>
-            <li>Configurez vos plages horaires, durée et nom du service.</li>
-            <li>Copiez le lien de réservation généré et collez-le dans <code className="font-mono bg-amber-100 px-1 rounded">google_calendar_url</code> ci-dessous.</li>
-          </ol>
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-5 text-amber-900">
+          <strong>Conseil :</strong> utilisez des images nettes, des titres courts et vérifiez le statut « Publié » avant de quitter la page.
         </div>
-      </div>
-
+      </section>
       <CrudTable
         title="Paramètres du site"
         resource="settings"

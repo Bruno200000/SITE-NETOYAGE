@@ -28,7 +28,7 @@ export function PaymentProofForm() {
     resolver: zodResolver(notifySchema)
   });
 
-  const interacEmail = company.email || "paiement@2jkservices.com";
+  const interacEmail = company.email || "2jkservicesinc@gmail.com";
 
   function copyInteracEmail() {
     navigator.clipboard.writeText(interacEmail);

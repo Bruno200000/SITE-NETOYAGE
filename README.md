@@ -89,7 +89,7 @@ Frontend local : `http://localhost:3000`
 Le fichier `frontend-nextjs/.env.local` pointe par défaut vers :
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost/api
+NEXT_PUBLIC_API_URL=https://votre-domaine.com/api
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 

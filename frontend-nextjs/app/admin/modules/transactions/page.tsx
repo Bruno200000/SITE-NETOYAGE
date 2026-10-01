@@ -28,7 +28,7 @@ export default function AdminTransactionsPage() {
             <div>
               <p className="text-[11px] font-black uppercase tracking-wider text-slate-700">Virement Interac</p>
               <p className="mt-0.5 text-[11px] text-slate-500">
-                Courriel Interac : <strong>contact@2jkservices.com</strong>. Confirmez la réception en changeant le statut à «Payé».
+                Courriel Interac : <strong>2jkservicesinc@gmail.com</strong>. Confirmez la réception en changeant le statut à «Payé».
               </p>
             </div>
           </div>

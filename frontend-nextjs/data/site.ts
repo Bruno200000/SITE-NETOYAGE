@@ -5,7 +5,7 @@ export const company = {
   slogan: "Des espaces impeccables, une equipe fiable, un service qui inspire confiance.",
   phone: "514 623 5610",
   whatsapp: "+15146235610",
-  email: "contact@2jkservices.com",
+  email: "2jkservicesinc@gmail.com",
   address: "Nouveau-Brunswick, Canada",
   zone_intervention: "Nouveau-Brunswick & régions environnantes",
   facebook: "https://www.facebook.com/2jkservices",

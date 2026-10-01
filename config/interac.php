@@ -37,7 +37,7 @@ function interac_config() {
         'mode'          => $mode,                       // TEST | PRODUCTION
         'is_live'       => $mode === 'PRODUCTION',
         'payee_name'    => interac_env('INTERAC_PAYEE_NAME', '2JK Services'),
-        'payee_email'   => interac_env('INTERAC_PAYEE_EMAIL', 'paiement@2jkservices.ca'),
+        'payee_email'   => interac_env('INTERAC_PAYEE_EMAIL', '2jkservicesinc@gmail.com'),
         'currency'      => interac_env('INTERAC_DEFAULT_CURRENCY', 'CAD'),
         'webhook_secret'=> interac_env('INTERAC_WEBHOOK_SECRET', ''),
         // À renseigner quand le PSP / la banque fournira l'API (laisser vide en attendant) :
